@@ -2,7 +2,7 @@ import os
 import subprocess
 import string
 import glob
-import re
+import statistics #para obtener desv estandar
 
 ######################### PARAMETERS ############################
 
@@ -17,28 +17,30 @@ silence_or_sound = ' 1 '
 
 def get_durations():
     all_files = glob.glob("./splitted/out*")
-    qty = 0
+    lista = []
     for file in all_files:
-        qty = qty + 1
-        outputs = subprocess.getoutput('soxi ' + file)
-
+        outputs = subprocess.getoutput('soxi -D ' + file)
+        lista.append(outputs)
         data_file = open("datos.txt", "a")
-        data_file.write(outputs)
+        data_file.write(file[11:] + " " + outputs + '\n')
         data_file.close()
 
+    lista = list(map(float, lista))
 
-        #Agregar solo la duracion, lo demas no me interesa por ahora
-    new_file = open("new.txt", "a")
-    with open("datos.txt") as f:
-        line = f.readlines()
-        for i in line: 
-            if "Duration" in i: new_file.write(i)
+    return lista
 
-    new_file.close()
-    os.system('rm datos.txt')
+def std_dev(lista):
+    desv = statistics.stdev(lista)
+    data_file = open("datos.txt", "a")
+    data_file.write("Desviacion estandar: " + str(desv) + "\n")
+    data_file.close()
 
-    return qtyq
-
+def average(lista):
+    av = statistics.mean(lista)
+    data_file = open("datos.txt", "a")
+    data_file.write("Duracion promedio: " + str(av) + "\n")
+    data_file.close()
+    
 ########################################################################
 
 ##########################MAIN############################################
@@ -46,7 +48,7 @@ def get_durations():
 
 os.system('sox aura.wav out.wav silence' + silence_or_sound + sound_long + thresold + silence_or_sound + silence_long + thresold + ': newfile : restart')
 os.system('mv out* ./splitted')
-qty = get_durations()
-
-print (qty)
+lista = get_durations()
+std_dev(lista)
+average(lista)
 
