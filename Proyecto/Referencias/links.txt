@@ -1,0 +1,4 @@
+analyticsvidhya.com/blog/2017/11/heart-sound-segmentation-deep-learning/
+
+http://practicalcryptography.com/miscellaneous/machine-learning/guide-mel-frequency-cepstral-coefficients-mfccs/
+
