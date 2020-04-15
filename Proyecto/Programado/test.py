@@ -6,11 +6,12 @@ import statistics #para obtener desv estandar
 import csv
 import matplotlib.pyplot as plt
 from AudiosDD import AudiosDD
+from Create import Create
 
-new_one = AudiosDD(1)
-new_one.segment_audio(' 5.0 ', ' 0.5 ', ' 1% ', ' 1 ')
-new_one.std_dev()
-new_one.average()
-new_one.txt_to_csv()
-new_one.plot_durations()
-new_one.delete_audio()
+Test = Create()
+
+Test.unzip("Audio.zip")
+Test.all_param()
+Test.create_instances()
+Test.txt_to_csv()
+print("Programa finalizado")
