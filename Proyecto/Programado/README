@@ -1,0 +1,10 @@
+El siguiente programa consiste en un sistema automatizado de segmentación de audios de larga duración. 
+
+Se encuentran tres archivos de Python:
+    AudiosDD.py contiene una clase AudiosDD con todos los métodos para la segmentación y obtención de datos.
+    Create.py contiene una clase Create que ejecuta todas las posibles combinaciones de parámetros dentro de cierto rango, y crea instancias de AudiosDD
+    test.py contiene las pruebas a realizar para ejecutar el programa
+
+***Para ejecutar el programa, basta con ejecutar en la terminal el comando "make", si se tiene Makefile instalado.
+***También, es posible ejecutar con el comando "python3 test.py" en la terminal.
+
