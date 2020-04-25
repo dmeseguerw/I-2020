@@ -1,0 +1,21 @@
+Este trabajo consiste en un conjunto de predictores de salto, desarrollados cada uno en una clase distinta. En el directorio doc/ se encuentran archivos respectivos a la documentacion.
+En el directorio src/ se encuentran todos los codigos respectivos a los predictores, además de un main.cpp para realizar pruebas.
+
+Se desarrolló un Makefile para facilitar la realización de pruebas.
+Si se desea realizar las pruebas dentro del Makefile se ejecuta lo siguiente en la terminal de Linux.
+    Compilar y ejecutar todos los predictores: "make"
+    Compilar: "make compile"
+    Ejecutar Bimodal: "make bimodal"
+    Ejecutar Gshare: "make gshare"
+    Ejecutar Pshare: "make pshare"
+    Ejecutar Tournament: "make tournament"
+
+Si se desean hacer otras pruebas, se debe seguir el siguiente formato:
+    gunzip -c branch-trace-gcc.trace.gz | head - <#> | branch -s < # > -bp < # > -gh < # > -ph < # > -o < # >
+
+Para compilar:
+    "g++ main.cpp" o "make compile"
+
+Para observar la documentación:
+    "doxygen doc/Doxyfile" o "make doxy"
+    Abrir en navegador doc/html/index.html
