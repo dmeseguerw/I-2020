@@ -1,3 +1,5 @@
+#ifndef METHODS_H
+#define METHODS_H
 #include <iostream>
 #include <fstream>
 #include <math.h> 
@@ -7,6 +9,13 @@ using namespace std;
 
 class Methods{
     public:
+        int txt_counter;
+        bool condition;
+        Methods(){
+            txt_counter = 0;
+            condition = false;
+        }
+
         string convert_state(int number){ //Convierte estados en binario a taken o not taken
             string real_state;
             if (number >= 2){real_state = "T";}
@@ -39,11 +48,8 @@ class Methods{
 
         string make_prediction(string predicted, string real){
             string prediction;
-
             if(predicted == real) prediction = "Correct";
             else prediction = "Incorrect";
-
-
             return prediction;
         }
 
@@ -66,4 +72,45 @@ class Methods{
         }
 
 
+        void create_txt(int bp, string input, int o){
+            Methods::txt_counter++;
+                if(Methods::txt_counter <= 5000){
+                    if(o==1){
+                        string predictor;
+                        if(bp == 0){predictor = "bimodal";}
+                        else if(bp == 2){predictor = "gshare";}
+                        else if(bp == 1){predictor = "pshare";}
+                        else if(bp == 3){predictor = "tournament";}
+                        ofstream txt_file;
+                        txt_file.open(predictor+".txt", ios::out | ios::app);
+                        txt_file << input << endl; 
+                        txt_file.close();
+                    }
+                }
+                else{Methods::condition = true;}
+        }
+
+
+        void print_results(string bp_choice, int bht_size, int gh, int ph, int branch_nmbr, int correct_taken, int incorrect_taken, int correct_ntaken, int incorrect_ntaken){
+            double corr_perc = ((double)(correct_taken + correct_ntaken)/(double)(branch_nmbr))*100.0;
+            
+
+
+            cout << "______________________________________________________________" << endl << "Prediction parameters: " << endl << "______________________________________________________________" << endl
+            << "Branch Prediction type:                                " << bp_choice << endl
+            << "BHT size (entries):                                    " << bht_size << endl
+            << "Global history register size:                          " << gh << endl
+            << "Private history register size:                         " << ph << endl
+            << "______________________________________________________________" << endl
+            << "Simulation results: " << endl << "______________________________________________________________" << endl
+            << "Number of branch:                                      " << branch_nmbr << endl
+            << "Number of correct prediction of taken branches:        " << correct_taken << endl
+            << "Number of incorrect prediction of taken branches:      " << incorrect_taken << endl
+            << "Number of correct prediction of not taken branches:    " << correct_ntaken << endl
+            << "Number of incorrect prediction of not taken branches:  " << incorrect_ntaken << endl
+            << "Percentage of correct predictions                      " << corr_perc << "%" << endl
+            << "______________________________________________________________" << endl;
+        }
 };
+
+#endif
