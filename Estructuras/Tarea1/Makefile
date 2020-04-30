@@ -1,7 +1,7 @@
 all: compile bimodal gshare pshare tournament doxy
 
 compile:
-	g++ main.cpp
+	g++ src/main.cpp
 
 bimodal:
 	gunzip -c ~/Downloads/branch-trace-gcc.trace.gz | ./a.out -s 3 -bp 0 -gh 4 -ph 3 -o 1
