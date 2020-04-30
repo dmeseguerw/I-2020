@@ -45,7 +45,7 @@ class Tournament{
             comparePred(pred_in_use, g_prediction, p_prediction, real); //Comparo prediccion
 
             //Escribo a archivo de texto
-            string txt_input = ln.substr(0, ln.find(" ")) + " | " + Tournament::prediction + " | " + real + " | " + Tournament::pred_status;
+            string txt_input = ln.substr(0, ln.find(" ")) + " |    " + Tournament::prediction + "    |      " + real + "       | " + Tournament::pred_status;
             met.create_txt(bp, txt_input, o);
 
             //Hago update al MetaPredictor
@@ -134,7 +134,6 @@ class Tournament{
 
             while(getline(cin, ln)){//Se lee el trace linea por linea
                 make_Tournament(ln, bp, s, gh, ph, o); //Se realiza la eleccion de predictor y la prediccion
-                if(met.condition) break;
                 
                 //Se hace update a los contadores de resultados.
                 if(prediction == "T" & pred_status == "Correct") c_taken++;

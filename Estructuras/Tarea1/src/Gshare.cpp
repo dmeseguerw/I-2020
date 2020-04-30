@@ -39,7 +39,7 @@ class Gshare{
             Gshare::pred_status = Gshare::met.make_prediction(Gshare::prediction, real); //Se realiza comparacion de prediccion
 
             //Se escribe a archivo de texto
-            string txt_input = ln.substr(0, ln.find(" ")) + " | " + Gshare::prediction + " | " + real + " | " + Gshare::pred_status;
+            string txt_input = ln.substr(0, ln.find(" ")) +  " |    " + Gshare::prediction + "    |      " + real + "       | " + Gshare::pred_status;
             met.create_txt(bp, txt_input, o);
 
             //Se hace update al arreglo de contadores y al registro de historia.
@@ -74,7 +74,6 @@ class Gshare{
             while(getline(cin,ln)){ //Se lee el trace linea por linea
 
                 make_Gpred(ln, bp, s, gh, o); //Se realiza una prediccion
-                if(met.condition) break;
 
                 //Se hace update a los contadores de resultados.
                 if(prediction == "T" & pred_status == "Correct") c_taken++;

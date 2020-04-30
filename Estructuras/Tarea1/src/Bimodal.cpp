@@ -29,7 +29,7 @@ class Bimodal{
             Bimodal::real = ln.back(); //Se obtiene el outcome real del branch.
             Bimodal::prediction = met.convert_state(Bimodal::contadores[index]); //Convierte de weak o strong a T o N
             Bimodal::pred_status = met.make_prediction(Bimodal::prediction, Bimodal::real); //Se compara si es correcta o incorrecta
-            txt_input = ln.substr(0, ln.find(" ")) + " | " + Bimodal::prediction + " | " + Bimodal::real + " | " + Bimodal::pred_status; //String a ingresar en el archivo de texto.
+            txt_input = ln.substr(0, ln.find(" ")) + " |    " + Bimodal::prediction + "    |      " + Bimodal::real + "       | " + Bimodal::pred_status; //String a ingresar en el archivo de texto.
             met.create_txt(bp, txt_input, o); //Se crea el archivo de texto si o es 1.
             Bimodal::contadores = met.update_contadores(Bimodal::contadores, index, real); //Se hace update al arreglo de contadores.
         }
@@ -55,7 +55,6 @@ class Bimodal{
             while(getline(cin,ln)){ //Se hace lectura linea por linea del archivo de entrada
 
                 make_Bipred(ln, s, bp, o); //Se realiza la prediccion segun el branch actual
-                if(met.condition) break; 
 
                 //Se actualizan los contadores de resultados segun el estado de la prediccion.
                 if(prediction == "T" & pred_status == "Correct") c_taken++;

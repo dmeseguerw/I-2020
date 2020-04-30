@@ -42,7 +42,7 @@ class Pshare{
             Pshare::pred_status = met.make_prediction(Pshare::prediction, real); //Comparo prediccion con outcome
 
             //Escribe a archivo de texto si o es 1.
-            string txt_input = ln.substr(0, ln.find(" ")) + " | " + Pshare::prediction + " | " + real + " | " + Pshare::pred_status;
+            string txt_input = ln.substr(0, ln.find(" ")) + " |    " + Pshare::prediction + "    |      " + real + "       | " + Pshare::pred_status;
             met.create_txt(bp, txt_input, o);
 
             //Hago update a BHT y a PHT.
@@ -74,7 +74,6 @@ class Pshare{
             while(getline(cin,ln)){//Leo el trace linea por linea
 
                 make_Ppred(ln, bp, s, ph, o); //Realizo prediccion
-                if(met.condition) break;
 
                 //Update a los contadores de resultados.
                 if(prediction == "T" & pred_status == "Correct") c_taken++;

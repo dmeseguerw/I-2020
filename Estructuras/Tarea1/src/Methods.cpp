@@ -18,13 +18,11 @@ using namespace std;
 class Methods{
     public:
         int txt_counter;
-        bool condition;
         /**
          * @brief Constructor de la clase Methods que inicializa un bool y un contador de lineas en la escritura de archivos.
          */
         Methods(){
             txt_counter = 0;
-            condition = false;
         }
 
         /**
@@ -136,11 +134,11 @@ class Methods{
                         else if(bp == 3){predictor = "tournament";}
                         ofstream txt_file;
                         txt_file.open(predictor+".txt", ios::out | ios::app);
+                        if(Methods::txt_counter == 1) txt_file << "   PC      | Outcome | Prediction | Correct/Incorrect " << endl;
                         txt_file << input << endl; 
                         txt_file.close();
                     }
                 }
-                else{Methods::condition = true;}
         }
 
         /**
