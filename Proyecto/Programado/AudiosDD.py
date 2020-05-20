@@ -47,8 +47,12 @@ class AudiosDD:
         data_file.close()
         print("         Duraciones obtenidas y guardadas!\n")
 
+        sum_file = open("summary.txt", "a")
         AudiosDD.std_dev(self)
         AudiosDD.average(self)
+        qty = os.popen('ls -1 | wc -l').read()
+        sum_file.write("  Prueba " + str(self.inst_number)+": " + str(self.desv) + " " + str(self.av) + " " + qty + "\n")
+        sum_file.close()
         AudiosDD.plot_durations(self)
         AudiosDD.delete_audio(self)
 

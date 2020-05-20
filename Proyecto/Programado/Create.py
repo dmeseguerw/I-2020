@@ -8,12 +8,13 @@ import matplotlib.pyplot as plt
 from AudiosDD import AudiosDD
 import itertools
 from zipfile import ZipFile 
+from scipy.io import wavfile as wav
 
 class Create:
     inst_list = []
-    sil = [' 3.0 ', ' 5.0 ', ' 2.0 ']
-    snd = [' 0.5 ', ' 0.9 ', ' 1.2 ']
-    th = [' 1% ', ' 1.5% ',' 0.9% ' ]
+    sil = [' 3.0 ', ' 1.0 ', ' 2.0 ', ' 4.0 ']
+    snd = [' 0.5 ', ' 0.25 ',' 0.1 ', ' 0.3 ']
+    th = [' 1% ', ' 1.5% ', ' 2% ', ' 0.5% ']
     param_list = []
 
     def unzip(self, fn):
@@ -41,11 +42,25 @@ class Create:
         for i in range(0,len(data)):
             data[i] = data[i].split()
         f.close()
+
+        summary = open("summary.txt",'r')
+        sum_data = summary.readlines()
+        for i in range(0,len(sum_data)):
+            sum_data[i] = sum_data[i].split()
+        summary.close()
         
         f_csv = open("datos.csv", 'w')
         with f_csv:
             writer = csv.writer(f_csv)
             writer.writerows(data)
 
+        sum_csv = open("sum.csv","w")
+        with sum_csv:
+            writer = csv.writer(sum_csv)
+            writer.writerows(sum_data)
+            
+
+        
+        sum_csv.close()
         f_csv.close()
         print("Archivo csv finalizado!\n")
