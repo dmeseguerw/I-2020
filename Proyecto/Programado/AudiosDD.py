@@ -5,6 +5,7 @@ import glob
 import statistics #para obtener desv estandar
 import csv
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class AudiosDD:
 
@@ -15,10 +16,15 @@ class AudiosDD:
         self.plot_image = ''
         self.desv = 0.0
         self.av = 0.0
+        self.max = 0.0
+        self.min = 0.0
         self.sors = ' 1 '
         self.si = sil
         self.sn = snd
         self.th = thd
+        self.df = pd.DataFrame()
+        self.Dict = {}
+        self.dictcounter = 0
         print("Instancias creadas!\n")
 
     def segment_audio(self):
@@ -34,27 +40,33 @@ class AudiosDD:
         print("     Proceso finalizado!\n")
 
 
+    def get_durations(self):
+        print("         Obteniendo duración de los audios...")
+        all_files = sorted(glob.glob("./splitted/out*"))
+
+
     def get_durations(self): #Obtener las duraciones de los segmentos, se guardan en datos.txt y se retorna una lista con las duraciones en orden
         print("         Obteniendo duración de los audios...")
         all_files = sorted(glob.glob("./splitted/out*"))
         self.lista = []
-        data_file = open("datos.txt", "a")
-        data_file.write("Prueba" + str(self.inst_number)+ "\n")
+        # data_file = open("datos.txt", "a")
+        # data_file.write("Prueba" + str(self.inst_number)+ "\n")
         for file in all_files:
-            outputs = subprocess.getoutput('soxi -D ' + file)
-            self.lista.append(float(outputs))
-            data_file.write(file[11:] + " " + outputs + '\n')
-        data_file.close()
+            duration = subprocess.getoutput('soxi -D ' + file)
+            self.Dict[file[11:]] = duration
+            # data_file.write(file[11:] + " " + outputs + '\n')
+        # data_file.close()
         print("         Duraciones obtenidas y guardadas!\n")
+        # print(self.Dict)
 
-        sum_file = open("summary.txt", "a")
-        AudiosDD.std_dev(self)
-        AudiosDD.average(self)
-        qty = os.popen('ls -1 | wc -l').read()
-        sum_file.write("  Prueba " + str(self.inst_number)+": " + str(self.desv) + " " + str(self.av) + " " + qty + "\n")
-        sum_file.close()
-        AudiosDD.plot_durations(self)
-        AudiosDD.delete_audio(self)
+        # sum_file = open("summary.txt", "a")
+        # AudiosDD.std_dev(self)
+        # AudiosDD.average(self)
+        # qty = os.popen('ls -1 | wc -l').read()
+        # sum_file.write("  Prueba " + str(self.inst_number)+": " + str(self.desv) + " " + str(self.av) + " " + qty + "\n")
+        # sum_file.close()
+        # AudiosDD.plot_durations(self)
+        # AudiosDD.delete_audio(self)
 
 
     def std_dev(self): #Obtengo la desviacion estandar de las duraciones de los segmentos
@@ -95,6 +107,9 @@ class AudiosDD:
         print("         Gráfica obtenida y guardada!\n")
 
     
+    # def get_max_and_min(self):
+
+
     def delete_audio(self):
         print("         Eliminando audios...")
         os.system("rm ./splitted/*")

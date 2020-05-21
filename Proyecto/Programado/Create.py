@@ -9,13 +9,16 @@ from AudiosDD import AudiosDD
 import itertools
 from zipfile import ZipFile 
 from scipy.io import wavfile as wav
+import pandas as pd
 
 class Create:
     inst_list = []
-    sil = [' 3.0 ', ' 1.0 ', ' 2.0 ', ' 4.0 ']
-    snd = [' 0.5 ', ' 0.25 ',' 0.1 ', ' 0.3 ']
-    th = [' 1% ', ' 1.5% ', ' 2% ', ' 0.5% ']
+    sil = [' 3.0 ', ' 1.0 ']
+    snd = [' 0.5 ', ' 0.25 ']
+    th = [' 1% ', ' 1.5% ']
     param_list = []
+    F_Dict = {}
+    Values = pd.DataFrame()
 
     def unzip(self, fn):
         file_name = fn
@@ -30,11 +33,27 @@ class Create:
 
 
     def create_instances(self): #Crea todas las instancias de la clase AudiosDD para cada set de parámetros distintos.
+        dict_list = []
+        key_list = []
+        empty_df = pd.DataFrame()
         for i in range(0,len(self.param_list)):
             print("Cargando Prueba " + str(i) + "...\n")
             self.inst_list.append(AudiosDD(i, self.param_list[i][0], self.param_list[i][1], self.param_list[i][2]))
             self.inst_list[i].segment_audio()
-    
+
+            # s = pd.Series(self.inst_list[i].Dict, name = 'Duracion')
+            # s.index.name = 'Nombre'
+            # s.reset_index()
+
+            # current_df = pd.DataFrame.from_dict(self.inst_list[i].Dict, orient = 'index', columns=['Name','Duration'])
+            current_df = pd.DataFrame(list(self.inst_list[i].Dict.iteritems()), columns = ['Name','Duration'])
+            print(current_df)
+            # current_df = df.set_index('Prueba'+str(self.inst_list[i].inst_number))
+            # self.Values.append(current_df)
+            # self.Values.append(empty_df)
+            # print(current_df)
+
+        # print(self.Values)
     def txt_to_csv(self): # Obtengo un archivo .csv para poder organizar los datos
         print("Creando archivo csv...")
         f = open("datos.txt",'r')

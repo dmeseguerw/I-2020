@@ -17,7 +17,7 @@ Test = Create()
 Test.unzip("Audio.zip")
 Test.all_param()
 Test.create_instances()
-Test.txt_to_csv()
+# Test.txt_to_csv()
 print("Programa finalizado")
 
 # fs, data = wav.read('new.wav')
