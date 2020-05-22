@@ -13,12 +13,14 @@ import pandas as pd
 
 class Create:
     inst_list = []
-    sil = [' 3.0 ', ' 1.0 ']
-    snd = [' 0.5 ', ' 0.25 ']
-    th = [' 1% ', ' 1.5% ']
+    sil = [' 3.0 ',' 2.0 ',' 4.0 ', ' 5.0 ']
+    snd = [' 0.5 ', ' 0.25 ', ' 0.1 ']
+    th = [' 1% ', ' 0.5% ', ' 1.5% ' ]
     param_list = []
     F_Dict = {}
-    Values = pd.DataFrame()
+    Values=pd.DataFrame(columns = ['Name','Duration'])
+    empty = pd.DataFrame()
+    df = pd.DataFrame(columns = ['STD','Av_Duration'])
 
     def unzip(self, fn):
         file_name = fn
@@ -33,27 +35,28 @@ class Create:
 
 
     def create_instances(self): #Crea todas las instancias de la clase AudiosDD para cada set de parámetros distintos.
-        dict_list = []
-        key_list = []
-        empty_df = pd.DataFrame()
+        serie = pd.Series()
+        
         for i in range(0,len(self.param_list)):
             print("Cargando Prueba " + str(i) + "...\n")
             self.inst_list.append(AudiosDD(i, self.param_list[i][0], self.param_list[i][1], self.param_list[i][2]))
             self.inst_list[i].segment_audio()
 
-            # s = pd.Series(self.inst_list[i].Dict, name = 'Duracion')
-            # s.index.name = 'Nombre'
-            # s.reset_index()
 
-            # current_df = pd.DataFrame.from_dict(self.inst_list[i].Dict, orient = 'index', columns=['Name','Duration'])
-            current_df = pd.DataFrame(list(self.inst_list[i].Dict.iteritems()), columns = ['Name','Duration'])
-            print(current_df)
-            # current_df = df.set_index('Prueba'+str(self.inst_list[i].inst_number))
-            # self.Values.append(current_df)
-            # self.Values.append(empty_df)
-            # print(current_df)
+            keys = list(self.inst_list[i].Dict.keys())
+            values = list(self.inst_list[i].Dict.values())
+            self.Values = self.Values.append(pd.Series(name='Prueba'+str(self.inst_list[i].inst_number)))
+            self.Values = self.Values.append(pd.DataFrame(list(zip(keys,values)), columns = ['Name','Duration']))
 
-        # print(self.Values)
+            p = pd.DataFrame({"STD":[self.inst_list[i].desv], "Av_Duration":[self.inst_list[i].av]})
+            self.df = self.df.append(p, ignore_index = True)
+            self.df.index.rename('Test', inplace=True)
+
+        print(self.df)
+
+        self.df.to_csv("Summary.csv")
+        self.Values.to_csv("Values.csv")
+
     def txt_to_csv(self): # Obtengo un archivo .csv para poder organizar los datos
         print("Creando archivo csv...")
         f = open("datos.txt",'r')

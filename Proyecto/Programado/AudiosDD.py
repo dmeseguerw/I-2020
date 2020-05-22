@@ -40,50 +40,33 @@ class AudiosDD:
         print("     Proceso finalizado!\n")
 
 
-    def get_durations(self):
-        print("         Obteniendo duración de los audios...")
-        all_files = sorted(glob.glob("./splitted/out*"))
-
-
     def get_durations(self): #Obtener las duraciones de los segmentos, se guardan en datos.txt y se retorna una lista con las duraciones en orden
         print("         Obteniendo duración de los audios...")
         all_files = sorted(glob.glob("./splitted/out*"))
         self.lista = []
-        # data_file = open("datos.txt", "a")
-        # data_file.write("Prueba" + str(self.inst_number)+ "\n")
+
         for file in all_files:
             duration = subprocess.getoutput('soxi -D ' + file)
             self.Dict[file[11:]] = duration
-            # data_file.write(file[11:] + " " + outputs + '\n')
-        # data_file.close()
-        print("         Duraciones obtenidas y guardadas!\n")
-        # print(self.Dict)
+            self.lista.append(float(duration))
 
-        # sum_file = open("summary.txt", "a")
-        # AudiosDD.std_dev(self)
-        # AudiosDD.average(self)
-        # qty = os.popen('ls -1 | wc -l').read()
-        # sum_file.write("  Prueba " + str(self.inst_number)+": " + str(self.desv) + " " + str(self.av) + " " + qty + "\n")
-        # sum_file.close()
-        # AudiosDD.plot_durations(self)
-        # AudiosDD.delete_audio(self)
+        print("         Duraciones obtenidas y guardadas!\n")
+
+        AudiosDD.std_dev(self)
+        AudiosDD.average(self)
+        AudiosDD.plot_durations(self)
+        AudiosDD.delete_audio(self)
 
 
     def std_dev(self): #Obtengo la desviacion estandar de las duraciones de los segmentos
         print("         Obteniendo desviación estándar...")
         self.desv = statistics.stdev(self.lista)
-        data_file = open("datos.txt", "a")
-        data_file.write("Desviacion_estandar: " + str(self.desv) + "\n")
-        data_file.close()
         print("         Desviación estándar obtenida y guardada!\n")
     
 
     def average(self): #Obtengo el promedio de duracion de los segmentos
         print("         Obteniendo duración promedio...")
         self.av = statistics.mean(self.lista)
-        data_file = open("datos.txt", "a")
-        data_file.write("Duracion_promedio: " + str(self.av) + "\n\n")
-        data_file.close()
         print("         Duración promedio obtenida y guardada!\n")
 
 
@@ -95,19 +78,17 @@ class AudiosDD:
         plt.title("Duración de los audios segmentados")
         plt.xlabel("Audio")
         plt.ylabel("Tiempo (s)")
-        # plt.show()
         image_name = 'test' + str(self.inst_number) + '.png'
+
         if (os.path.exists("./Images")):
             plt.savefig("./Images/"+image_name)
         else:
             os.system("mkdir Images")
             plt.savefig("./Images/"+image_name)
+
         self.plot_image = image_name
         plt.clf()
         print("         Gráfica obtenida y guardada!\n")
-
-    
-    # def get_max_and_min(self):
 
 
     def delete_audio(self):
