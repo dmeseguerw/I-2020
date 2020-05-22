@@ -10,17 +10,43 @@ import itertools
 from zipfile import ZipFile 
 from scipy.io import wavfile as wav
 import pandas as pd
+import numpy as np
 
 class Create:
-    inst_list = []
-    sil = [' 3.0 ',' 2.0 ',' 4.0 ', ' 5.0 ']
-    snd = [' 0.5 ', ' 0.25 ', ' 0.1 ']
-    th = [' 1% ', ' 0.5% ', ' 1.5% ' ]
-    param_list = []
-    F_Dict = {}
-    Values=pd.DataFrame(columns = ['Name','Duration'])
-    empty = pd.DataFrame()
-    df = pd.DataFrame(columns = ['STD','Av_Duration'])
+    def __init__(self, silence_rng, sound_rng, th_rng):
+        self.sil = [float(i) for i in silence_rng]
+        self.snd = [float(i) for i in sound_rng]
+        self.th =  [float(i) for i in th_rng]
+        self.inst_list = []
+        self.param_list = []
+        self.F_Dict = {}
+        self.Values=pd.DataFrame(columns = ['Name','Duration'])
+        self.empty = pd.DataFrame()
+        self.df = pd.DataFrame(columns = ['STD','Av_Duration'])
+
+    def get_parameters(self):
+        new_sil = []
+        new_snd = []
+        n_th = []
+
+        for i in np.arange(self.sil[0], self.sil[1]+1.0, 1.0): 
+            new_sil.append(str(round(i,1)))
+        for i in np.arange(self.snd[0], self.snd[1], 0.1):
+            new_snd.append(str(round(i, 1)))
+        for i in np.arange(self.th[0], self.th[1] + 0.5, 0.5):
+            n_th.append(str(round(i,1)))
+
+        new_th = []
+        for i in range(0,len(n_th)):
+            new_th.append(n_th[i] + "%")
+            
+        self.sil = new_sil
+        self.snd = new_snd
+        self.th = new_th
+
+        print(new_sil)
+        print(new_snd)
+        print(new_th)
 
     def unzip(self, fn):
         file_name = fn
@@ -31,58 +57,39 @@ class Create:
         print("Obteniendo todas las posibles combinaciones de parámetros...")
         new_list = [self.sil, self.snd, self.th]
         self.param_list = list(itertools.product(*new_list))
-        print("Combinaciones obtenidas!\n")
+        print(str(len(self.param_list)) + " combinaciones obtenidas!\n")
+        print(self.param_list)
 
 
     def create_instances(self): #Crea todas las instancias de la clase AudiosDD para cada set de parámetros distintos.
         serie = pd.Series()
-        
+        st_dev = []
+        av_dur = []
         for i in range(0,len(self.param_list)):
             print("Cargando Prueba " + str(i) + "...\n")
             self.inst_list.append(AudiosDD(i, self.param_list[i][0], self.param_list[i][1], self.param_list[i][2]))
             self.inst_list[i].segment_audio()
 
-
+            # Este bloque es para crear el dataframe de todas las duraciones de todas las pruebas
             keys = list(self.inst_list[i].Dict.keys())
             values = list(self.inst_list[i].Dict.values())
             self.Values = self.Values.append(pd.Series(name='Prueba'+str(self.inst_list[i].inst_number)))
             self.Values = self.Values.append(pd.DataFrame(list(zip(keys,values)), columns = ['Name','Duration']))
 
-            p = pd.DataFrame({"STD":[self.inst_list[i].desv], "Av_Duration":[self.inst_list[i].av]})
+            # Este bloque es para crear el dataframe de la duracion promedio y desviacion estandar de cada prueba
+            st_dev.append(self.inst_list[i].desv)
+            av_dur.append(self.inst_list[i].av)
+            p = pd.DataFrame({"STD":[st_dev[i]], "Av_Duration":[av_dur[i]]})
             self.df = self.df.append(p, ignore_index = True)
             self.df.index.rename('Test', inplace=True)
 
-        print(self.df)
+        # Este bloque agrega al dataframe los valores maximos y minimos de duracion promedio y desviacion estandar
+        self.df.loc[0, 'MAX_Dur'] = max(av_dur)
+        self.df.loc[0, 'MIN_Dur'] = min(av_dur)
+        self.df.loc[0, 'MAX_STD'] = max(st_dev)
+        self.df.loc[0, 'MIN_STD'] = min(st_dev)
+
 
         self.df.to_csv("Summary.csv")
         self.Values.to_csv("Values.csv")
 
-    def txt_to_csv(self): # Obtengo un archivo .csv para poder organizar los datos
-        print("Creando archivo csv...")
-        f = open("datos.txt",'r')
-        data = f.readlines()
-        for i in range(0,len(data)):
-            data[i] = data[i].split()
-        f.close()
-
-        summary = open("summary.txt",'r')
-        sum_data = summary.readlines()
-        for i in range(0,len(sum_data)):
-            sum_data[i] = sum_data[i].split()
-        summary.close()
-        
-        f_csv = open("datos.csv", 'w')
-        with f_csv:
-            writer = csv.writer(f_csv)
-            writer.writerows(data)
-
-        sum_csv = open("sum.csv","w")
-        with sum_csv:
-            writer = csv.writer(sum_csv)
-            writer.writerows(sum_data)
-            
-
-        
-        sum_csv.close()
-        f_csv.close()
-        print("Archivo csv finalizado!\n")

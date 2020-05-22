@@ -12,11 +12,16 @@ from scipy.fftpack import fft
 import numpy as np
 from scipy.fftpack import fft,fftfreq
 
-Test = Create()
+# Rangos de parametros: inicio y final
+sil = ['3.0','5.0']
+snd = ['0.1','0.5']
+th = ['0.5', '1.5']
 
+Test = Create(sil, snd, th)
+Test.get_parameters()
 Test.unzip("Audio.zip")
 Test.all_param()
 Test.create_instances()
-# Test.txt_to_csv()
+
 print("Programa finalizado")
 

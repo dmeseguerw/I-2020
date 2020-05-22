@@ -18,7 +18,7 @@ class AudiosDD:
         self.av = 0.0
         self.max = 0.0
         self.min = 0.0
-        self.sors = ' 1 '
+        self.sors = '1'
         self.si = sil
         self.sn = snd
         self.th = thd
@@ -29,7 +29,7 @@ class AudiosDD:
 
     def segment_audio(self):
         print("     Comenzando segmentación de audios...")
-        os.system('sox aura.wav out.wav silence' + self.sors + self.sn + self.th + self.sors + self.si + self.th + ': newfile : restart')
+        os.system('sox aura.wav out.wav silence ' + self.sors + ' ' + self.sn + ' ' + self.th + ' ' + self.sors + ' ' + self.si + ' ' + self.th + ' : newfile : restart')
         
         if(os.path.exists('./splitted' == False)):
             os.system("mkdir splitted")
