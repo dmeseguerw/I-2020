@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 from AudiosDD import AudiosDD
 import itertools
 from zipfile import ZipFile 
-from scipy.io import wavfile as wav
 import pandas as pd
 import numpy as np
 
@@ -31,7 +30,7 @@ class Create:
 
         for i in np.arange(self.sil[0], self.sil[1]+1.0, 1.0): 
             new_sil.append(str(round(i,1)))
-        for i in np.arange(self.snd[0], self.snd[1], 0.1):
+        for i in np.arange(self.snd[0], self.snd[1]+0.1, 0.1):
             new_snd.append(str(round(i, 1)))
         for i in np.arange(self.th[0], self.th[1] + 0.5, 0.5):
             n_th.append(str(round(i,1)))
@@ -44,9 +43,7 @@ class Create:
         self.snd = new_snd
         self.th = new_th
 
-        print(new_sil)
-        print(new_snd)
-        print(new_th)
+
 
     def unzip(self, fn):
         file_name = fn
@@ -58,7 +55,7 @@ class Create:
         new_list = [self.sil, self.snd, self.th]
         self.param_list = list(itertools.product(*new_list))
         print(str(len(self.param_list)) + " combinaciones obtenidas!\n")
-        print(self.param_list)
+        # print(self.param_list)
 
 
     def create_instances(self): #Crea todas las instancias de la clase AudiosDD para cada set de parámetros distintos.
@@ -90,6 +87,38 @@ class Create:
         self.df.loc[0, 'MIN_STD'] = min(st_dev)
 
 
-        self.df.to_csv("Summary.csv")
-        self.Values.to_csv("Values.csv")
+        if (os.path.exists("./CSV_Files") == False):
+            os.system("mkdir CSV_Files")
 
+        self.df.to_csv("./CSV_Files/Summary.csv")
+        self.Values.to_csv("./CSV_Files/Values.csv")
+
+    def plot_av_durations(self):
+
+        names = list(range(0,len(self.inst_list)))
+        values = self.df['Av_Duration'].tolist()
+        plt.bar(names,values)
+        plt.title("Duración promedio de las pruebas")
+        plt.xlabel("Prueba")
+        plt.ylabel("Tiempo (s)")
+
+        if (os.path.exists("./Images") == False):
+            os.system("mkdir Images")
+
+        plt.savefig("./Images/Plot_Av_Dur.png")
+        plt.clf()
+
+    def plot_stds(self):
+        names = list(range(0,len(self.inst_list)))
+        values = self.df['STD'].tolist()
+        plt.bar(names,values)
+        plt.title("Desviacion estandar de las pruebas")
+        plt.xlabel("Prueba")
+        plt.ylabel("Tiempo (s)")
+
+        if (os.path.exists("./Images") == False):
+            os.system("mkdir Images")
+
+        plt.savefig("./Images/STD.png")
+
+        plt.clf()

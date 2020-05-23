@@ -31,7 +31,7 @@ class AudiosDD:
         print("     Comenzando segmentación de audios...")
         os.system('sox aura.wav out.wav silence ' + self.sors + ' ' + self.sn + ' ' + self.th + ' ' + self.sors + ' ' + self.si + ' ' + self.th + ' : newfile : restart')
         
-        if(os.path.exists('./splitted' == False)):
+        if(os.path.exists('./splitted')==False):
             os.system("mkdir splitted")
             
         os.system('mv out* ./splitted')
@@ -73,18 +73,17 @@ class AudiosDD:
     def plot_durations(self): #Obtengo una grafica que muestra en comparacion todas las duraciones de los segmentos
         print("         Obteniendo gráfica...")
         values = self.lista
-        names = sorted(os.listdir('./splitted'))
+        names = list(range(0,len(self.lista)))
         plt.bar(names,values)
         plt.title("Duración de los audios segmentados")
         plt.xlabel("Audio")
         plt.ylabel("Tiempo (s)")
         image_name = 'test' + str(self.inst_number) + '.png'
 
-        if (os.path.exists("./Images")):
-            plt.savefig("./Images/"+image_name)
-        else:
+        if (os.path.exists("./Images")==False):
             os.system("mkdir Images")
-            plt.savefig("./Images/"+image_name)
+
+        plt.savefig("./Images/"+image_name)
 
         self.plot_image = image_name
         plt.clf()
