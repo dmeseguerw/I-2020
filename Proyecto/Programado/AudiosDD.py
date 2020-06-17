@@ -60,7 +60,8 @@ class AudiosDD:
 
     def std_dev(self): #Obtengo la desviacion estandar de las duraciones de los segmentos
         print("         Obteniendo desviación estándar...")
-        self.desv = statistics.stdev(self.lista)
+        lista = self.lista  
+        self.desv = statistics.pstdev(lista)
         print("         Desviación estándar obtenida y guardada!\n")
     
 

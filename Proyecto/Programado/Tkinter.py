@@ -2,7 +2,20 @@ try:
     import Tkinter as tk
 except:
     import tkinter as tk
-    
+
+from test import run
+import os
+import subprocess
+import string
+import glob
+import statistics #para obtener desv estandar
+import csv
+import matplotlib.pyplot as plt
+from AudiosDD import AudiosDD
+from Create import Create
+import numpy as np
+
+
 class SampleApp(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
@@ -23,7 +36,7 @@ class StartPage(tk.Frame):
         tk.Button(self, text="Go to page one",
                   command=lambda: master.switch_frame(PageOne)).pack()
         tk.Button(self, text="Go to page two",
-                  command=lambda: master.switch_frame(PageTwo)).pack()
+                  command=run())
 
 class PageOne(tk.Frame):
     def __init__(self, master):
