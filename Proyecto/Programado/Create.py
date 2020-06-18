@@ -101,11 +101,11 @@ class Create:
         plt.title("Duración promedio de las pruebas")
         plt.xlabel("Prueba")
         plt.ylabel("Tiempo (s)")
+        plt.xticks(np.arange(0, len(self.inst_list), 1))
+        if (os.path.exists("./Images_Global") == False):
+            os.system("mkdir Images_Global")
 
-        if (os.path.exists("./Images") == False):
-            os.system("mkdir Images")
-
-        plt.savefig("./Images/Plot_Av_Dur.png")
+        plt.savefig("./Images_Global/Plot_Av_Dur.png")
         plt.clf()
 
     def plot_stds(self):
@@ -115,10 +115,10 @@ class Create:
         plt.title("Desviacion estandar de las pruebas")
         plt.xlabel("Prueba")
         plt.ylabel("Tiempo (s)")
+        plt.xticks(np.arange(0, len(self.inst_list), 1))
+        if (os.path.exists("./Images_Global") == False):
+            os.system("mkdir Images_Global")
 
-        if (os.path.exists("./Images") == False):
-            os.system("mkdir Images")
-
-        plt.savefig("./Images/STD.png")
+        plt.savefig("./Images_Global/STD.png")
 
         plt.clf()

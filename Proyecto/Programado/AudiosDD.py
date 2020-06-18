@@ -79,6 +79,7 @@ class AudiosDD:
         plt.title("Duración de los audios segmentados")
         plt.xlabel("Audio")
         plt.ylabel("Tiempo (s)")
+        plt.xticks(np.arange(0, len(self.lista), 1))
         image_name = 'test' + str(self.inst_number) + '.png'
 
         if (os.path.exists("./Images")==False):
