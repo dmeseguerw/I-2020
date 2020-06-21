@@ -6,11 +6,13 @@ import statistics #para obtener desv estandar
 import csv
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 class AudiosDD:
 
-    def __init__(self, inst_number, sil, snd, thd):
+    def __init__(self, file_name, inst_number, sil, snd, thd):
         print("Creando instancias...")
+        self.file_name = file_name
         self.inst_number = inst_number
         self.lista = []
         self.plot_image = ''
@@ -29,7 +31,7 @@ class AudiosDD:
 
     def segment_audio(self):
         print("     Comenzando segmentación de audios...")
-        os.system('sox aura.wav out.wav silence ' + self.sors + ' ' + self.sn + ' ' + self.th + ' ' + self.sors + ' ' + self.si + ' ' + self.th + ' : newfile : restart')
+        os.system('sox ' + self.file_name +   ' out.wav silence ' + self.sors + ' ' + self.sn + ' ' + self.th + ' ' + self.sors + ' ' + self.si + ' ' + self.th + ' : newfile : restart')
         
         if(os.path.exists('./splitted')==False):
             os.system("mkdir splitted")
@@ -48,26 +50,26 @@ class AudiosDD:
         for file in all_files:
             duration = subprocess.getoutput('soxi -D ' + file)
             self.Dict[file[11:]] = duration
-            self.lista.append(float(duration))
+            self.lista.append(round(float(duration),2))
 
         print("         Duraciones obtenidas y guardadas!\n")
 
         AudiosDD.std_dev(self)
         AudiosDD.average(self)
         AudiosDD.plot_durations(self)
-        AudiosDD.delete_audio(self)
+        # AudiosDD.delete_audio(self)
 
 
     def std_dev(self): #Obtengo la desviacion estandar de las duraciones de los segmentos
         print("         Obteniendo desviación estándar...")
         lista = self.lista  
-        self.desv = statistics.pstdev(lista)
+        self.desv = round(statistics.pstdev(lista),2)
         print("         Desviación estándar obtenida y guardada!\n")
     
 
     def average(self): #Obtengo el promedio de duracion de los segmentos
         print("         Obteniendo duración promedio...")
-        self.av = statistics.mean(self.lista)
+        self.av = round(statistics.mean(self.lista),2)
         print("         Duración promedio obtenida y guardada!\n")
 
 

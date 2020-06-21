@@ -12,10 +12,14 @@ import pandas as pd
 import numpy as np
 
 class Create:
-    def __init__(self, silence_rng, sound_rng, th_rng):
+    def __init__(self, file_name, silence_rng, silence_step, sound_rng, sound_step, th_rng, th_step):
+        self.file_name = file_name
         self.sil = [float(i) for i in silence_rng]
         self.snd = [float(i) for i in sound_rng]
         self.th =  [float(i) for i in th_rng]
+        self.sil_step = silence_step
+        self.snd_step = sound_step
+        self.th_step = th_step
         self.inst_list = []
         self.param_list = []
         self.F_Dict = {}
@@ -28,11 +32,11 @@ class Create:
         new_snd = []
         n_th = []
 
-        for i in np.arange(self.sil[0], self.sil[1]+1.0, 1.0): 
+        for i in np.arange(self.sil[0], self.sil[1]+self.sil_step, self.sil_step): 
             new_sil.append(str(round(i,1)))
-        for i in np.arange(self.snd[0], self.snd[1]+0.1, 0.1):
+        for i in np.arange(self.snd[0], self.snd[1]+self.snd_step, self.snd_step):
             new_snd.append(str(round(i, 1)))
-        for i in np.arange(self.th[0], self.th[1] + 0.5, 0.5):
+        for i in np.arange(self.th[0], self.th[1] + self.th_step, self.th_step):
             n_th.append(str(round(i,1)))
 
         new_th = []
@@ -45,10 +49,10 @@ class Create:
 
 
 
-    def unzip(self, fn):
-        file_name = fn
-        with ZipFile(file_name, 'r') as zip:
-            zip.extractall()
+    # def unzip(self, fn):
+    #     file_name = fn
+    #     with ZipFile(file_name, 'r') as zip:
+    #         zip.extractall()
 
     def all_param(self): #Crea una lista con todas las posibles combinaciones entre los parámetros adjuntos en las listas sil, snd y th
         print("Obteniendo todas las posibles combinaciones de parámetros...")
@@ -64,8 +68,9 @@ class Create:
         av_dur = []
         for i in range(0,len(self.param_list)):
             print("Cargando Prueba " + str(i) + "...\n")
-            self.inst_list.append(AudiosDD(i, self.param_list[i][0], self.param_list[i][1], self.param_list[i][2]))
+            self.inst_list.append(AudiosDD(self.file_name, i, self.param_list[i][0], self.param_list[i][1], self.param_list[i][2]))
             self.inst_list[i].segment_audio()
+            self.inst_list[i].delete_audio()
 
             # Este bloque es para crear el dataframe de todas las duraciones de todas las pruebas
             keys = list(self.inst_list[i].Dict.keys())

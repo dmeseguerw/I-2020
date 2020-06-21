@@ -11,16 +11,15 @@ import numpy as np
 import time
 
 # Rangos de parametros: inicio y final
-def run():
+def run(file_name, sil_list, sil_step, snd_list, snd_step, th_list, th_step):
     start_time = time.time()
-    sil = ['3.0','3.0']
-    snd = ['0.1','0.2']
-    th = ['0.5', '1.0']
 
-    Test = Create(sil, snd, th)
+
+    Test = Create(file_name, sil_list, sil_step, snd_list, snd_step, th_list, th_step)
     print(time.time()-start_time)
     Test.get_parameters()
-    Test.unzip("Audio.zip")
+    # Test.unzip("Audio.zip")
+
     Test.all_param()
     Test.create_instances()
     Test.plot_av_durations()
@@ -28,5 +27,9 @@ def run():
 
     print("Programa finalizado")
     
-    return
+def run_selected_test(file_name, inst_number, sil, snd, th):
+    os.system("rm -r Images/*")
+    Test = AudiosDD(file_name, inst_number, sil, snd, th)
+    Test.segment_audio()
+
 
