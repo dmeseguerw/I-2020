@@ -4,5 +4,5 @@ execute:
 	python3 test.py
 
 clean:
-	rm splitted/* Images/*
+	rm Images/* Images_Global/*
 	rm -r Waves/*

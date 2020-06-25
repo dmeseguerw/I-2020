@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import os
 import subprocess
 import string
@@ -102,7 +103,7 @@ class Create:
 
         names = list(range(0,len(self.inst_list)))
         values = self.df['Av_Duration'].tolist()
-        plt.bar(names,values)
+        plt.bar(names,values, color="#216583")
         plt.title("Duración promedio de las pruebas")
         plt.xlabel("Prueba")
         plt.ylabel("Tiempo (s)")
@@ -116,7 +117,7 @@ class Create:
     def plot_stds(self):
         names = list(range(0,len(self.inst_list)))
         values = self.df['STD'].tolist()
-        plt.bar(names,values)
+        plt.bar(names,values, color="#216583")
         plt.title("Desviacion estandar de las pruebas")
         plt.xlabel("Prueba")
         plt.ylabel("Tiempo (s)")

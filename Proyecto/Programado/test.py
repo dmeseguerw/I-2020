@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 import subprocess
 import string
@@ -33,3 +35,5 @@ def run_selected_test(file_name, inst_number, sil, snd, th):
     Test.segment_audio()
 
 
+def play_audio(audio_file):
+    os.system("vlc splitted/"+audio_file)

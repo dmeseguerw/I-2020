@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import os
 import subprocess
 import string
@@ -77,7 +79,7 @@ class AudiosDD:
         print("         Obteniendo gráfica...")
         values = self.lista
         names = list(range(0,len(self.lista)))
-        plt.bar(names,values)
+        plt.bar(names,values, color="#216583")
         plt.title("Duración de los audios segmentados")
         plt.xlabel("Audio")
         plt.ylabel("Tiempo (s)")
