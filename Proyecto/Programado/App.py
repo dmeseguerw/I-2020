@@ -6,23 +6,19 @@ except:
     import tkinter as tk
 
 from tkinter import ttk
-
 import itertools
-import test
 import os
 import subprocess
 import string
 import glob
-import statistics 
 import csv
-import matplotlib.pyplot as plt
-from AudiosDD import AudiosDD
-from Create import Create
-import numpy as np
 from PIL import Image
 from PIL import ImageTk
 from tkinter.filedialog import askopenfile 
 
+import test
+from Segmentation import Segmentation
+from Automatic import Automatic
 
 favorites_list = []
 durations_list = []
@@ -31,7 +27,7 @@ file = ""
 snd_list = []
 sil_list = []
 th_list = []
-
+status = 0
 
 class SampleApp(tk.Tk):
     def __init__(self):
@@ -46,18 +42,12 @@ class SampleApp(tk.Tk):
         self._frame = new_frame
         self._frame.pack()
 
-    
-
-
 
 class StartPage(tk.Frame):
-    def clean(self):
-        os.system("make clean")
-
     def __init__(self, master):
         tk.Frame.__init__(self, master)
 
-        tk.Label(self, text="Automatic Audio Segmentation System \n By Daniel Meseguer Wong\n",fg="#293462", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=5)
+        tk.Label(self, text="Automatic Audio Segmentation System\n",fg="#293462", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=5)
 
         
         self.btn_frame = tk.Frame(self)
@@ -67,7 +57,7 @@ class StartPage(tk.Frame):
 
         
 
-        tk.Button(self.btn_frame, text="Help guide", activeforeground="white", fg="white",bg="#216583",activebackground="#0880af", command=lambda: master.switch_frame(PageHelp)).pack(side="left")
+        tk.Button(self.btn_frame, text="Help", activeforeground="white", fg="white",bg="#216583",activebackground="#0880af", command=lambda: master.switch_frame(PageHelp)).pack(side="left")
 
         tk.Button(self.btn_frame, text="Exit", bg="#f76262" , activebackground="#ff8080",activeforeground="white", fg = "white",
                   command=lambda:[quit()]).pack(side="left")
@@ -80,7 +70,6 @@ class StartPage(tk.Frame):
 
 
 class PageHelp(tk.Frame):
-
     def __init__(self, master):
         tk.Frame.__init__(self, master)
         tk.Label(self, text="Help", fg="#216583", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=5)
@@ -115,10 +104,6 @@ class PageHelp(tk.Frame):
                   command=lambda: self.help_params(3))
         self.b2.pack(side="left")
 
-        
-
-
-
     def help_params(self, selection):
         if(selection==2):
             self.b1.configure(bg="#216583",fg="white", activebackground="#2e599b", activeforeground="white")
@@ -135,7 +120,6 @@ class PageHelp(tk.Frame):
             self.b2.configure(bg="#fff1c1", fg = "#216583", activeforeground="#216583", activebackground="#fcfbdd")
             self.b3.configure(bg="#216583",fg="white", activebackground="#2e599b", activeforeground="white")
             self.l1["text"]="\n\nAudio segmentation is a pre process step involved in speech technology systems, specifically on speech recognition.\n This system provides an automatic and simple way to segment an audio file based on a selection of parameters.\n Once the parameters are saved, you can proceed to segment the audio, which will take some time, and once it's done,\n results will show up both for tests individually and globally, including average durations and standard deviations.\n\n"
-
 
 
 class Page_Parameter(tk.Frame):
@@ -233,7 +217,7 @@ class Page_Parameter(tk.Frame):
  
     def run_test(self):
         print(sil_list)
-        test.run(file, sil_list, self.sil_step, snd_list, self.snd_step, th_list, self.th_step)
+        test.run(file, sil_list, snd_list, th_list)
         self.par_label['text'] = 'Done! Click on View results\n'
         self.pb.step(347.9999)
         self.seg_btn.configure(bg = "#fff1c1", activebackground="#fcfbdd",fg = "#216583", activeforeground="#0880af")
@@ -250,18 +234,10 @@ class Page_Parameter(tk.Frame):
         sil = self.range_sil.get()
         snd = self.range_snd.get()
         th = self.range_th.get()
+
         sil_list = [float(i) for i in sil.split(',')]
-        self.sil_step = sil_list[2]
-        sil_list.pop(2)
-
-
         snd_list = [float(i) for i in snd.split(',')]
-        self.snd_step = snd_list[2]
-        snd_list.pop(2)
-
         th_list = [float(i) for i in th.split(',')]
-        self.th_step = th_list[2]
-        th_list.pop(2)
 
         print(sil_list)
         print(snd_list)
@@ -270,18 +246,16 @@ class Page_Parameter(tk.Frame):
         self.par_btn.configure(bg = "#fff1c1", activebackground="#fcfbdd",fg = "#216583", activeforeground="#0880af")
         self.seg_btn.configure(bg = "#216583", activebackground="#0880af", fg="white", activeforeground="white")
 
-class PageResults(tk.Frame):
 
+class PageResults(tk.Frame):
     def __init__(self, master):
         global durations_list
         global std_list
         global favorites_list
+        global status
         tk.Frame.__init__(self, master)
         tk.Frame.configure(self)
         tk.Label(self, text="Test selection", fg = "#293462",font=('Helvetica', 18, "bold")).pack()
-        tk.Label(self, text="\n").pack()
-        tk.Button(self, text="View global results and favorites", bg = "#216583", activebackground="#0880af", fg="#fff1c1", activeforeground="#fcfbdd",
-                  command=lambda: master.switch_frame(PageGlobRes)).pack()
         tk.Label(self, text="\n").pack()
         tk.Label(self, text="Select test: ", fg="#216583").pack()
 
@@ -294,28 +268,89 @@ class PageResults(tk.Frame):
         self.data_label = tk.Label(self, text="\n Average duration: "+durations_list[0] + "\n Standard deviation: " + std_list[0], fg="#293462",font=('Helvetica', 12, "bold"))
         self.data_label.pack()
 
+
+        
+        tk.Label(self, text="\n").pack()
+
+        self.img_frame = tk.Frame(self)
+        self.img1 = ImageTk.PhotoImage(Image.open("Images_Global/Plot_Av_Dur.png"))
+        self.lab1 = tk.Label(self.img_frame, image=self.img1)
+        self.lab1.image = self.img1
+        # self.lab1.pack(side="left")
+
+
+        self.img2 = ImageTk.PhotoImage(Image.open("Images_Global/STD.png"))
+        self.lab2 = tk.Label(self.img_frame, image=self.img2)
+        self.lab2.image = self.img2
+        # self.lab2.pack(side="right")
+
+
+        self.fav_frame = tk.Frame(self)
+        self.fav_frame.pack()
+
         self.Fav = tk.StringVar(self)
         if(self.a.get() in favorites_list):
-            self.Fav.set("Saved in favorites!")
-            self.fav_button = tk.Button(self, textvariable=self.Fav, command=lambda: self.favorite())
-            self.fav_button.pack()
-            self.fav_button.configure(bg="#216583", activebackground="#0880af", fg="white", activeforeground="#fcfbdd")
+            self.Fav.set("Remove from favorites")
+            self.fav_button = tk.Button(self.fav_frame, textvariable=self.Fav, command=lambda: self.favorite())
+            self.fav_button.pack(side="left")
+            self.fav_button.configure(fg="#216583", activeforeground="#0880af", bg="#fff1c1", activebackground="#fcfbdd")
         else:
             self.Fav.set("Add to favorites")
-            self.fav_button = tk.Button(self, textvariable=self.Fav, command=lambda: self.favorite())
-            self.fav_button.pack()
-            self.fav_button.configure(fg="#216583", activeforeground="#0880af", bg="#fff1c1", activebackground="#fcfbdd")
+            self.fav_button = tk.Button(self.fav_frame, textvariable=self.Fav, command=lambda: self.favorite())
+            self.fav_button.pack(side="left")
+            self.fav_button.configure(bg="#216583", activebackground="#0880af", fg="white", activeforeground="#fcfbdd")
+
+
+        self.a.trace("w", self.callback)
+
+        self.goto_fav = tk.Button(self.fav_frame, text="View favorites", bg="#293462", activebackground="#2e599b", activeforeground="white", fg = "white",
+                  command=lambda: [self.reset_status(),master.switch_frame(FinalPage)])
+        self.warning = tk.Label(self, text="")
+        self.warning.pack()
+      
+        
+        if (self.a.get() in favorites_list):
+            self.goto_fav.pack(side="left")
+            self.warning["text"] = ""
+        else:
+            self.goto_fav.pack_forget()
+            self.warning["text"] = "Select at least one favorite!"
+
+        tk.Label(self, text="\n").pack()
+        self.glob_btn = tk.Button(self, text="View global results", bg = "#216583", activebackground="#0880af", fg="#fff1c1", activeforeground="#fcfbdd",
+                  command=lambda: self.view_global())
+        self.glob_btn.pack()
 
         self.img = ImageTk.PhotoImage(Image.open("Images/test0.png"))
         self.lab = tk.Label(self, image=self.img)
         self.lab.image = self.img
         self.lab.pack()
 
-        self.a.trace("w", self.callback)
-
-        tk.Label(self, text="\n\n").pack()
-        tk.Button(self, text="Go back to parameters selection", bg="#f76262", activebackground="#ff8080", activeforeground="white", fg = "white",
+        tk.Button(self, text="New segmentation", bg="#f76262", activebackground="#ff8080", activeforeground="white", fg = "white",
                   command=lambda: master.switch_frame(Page_Parameter)).pack(side="bottom")
+
+    def view_global(self):
+        global status
+        print(status)
+        if (status==0):
+            self.glob_btn["text"]="View test results"
+            self.lab.pack_forget()
+            self.img_frame.pack()
+            self.lab1.pack(side="left")
+            self.lab2.pack(side="right")
+            status = 1
+        elif(status==1):
+            self.glob_btn["text"]="View global results"
+            self.lab.pack()
+            self.img_frame.pack_forget()
+            self.lab1.pack_forget()
+            self.lab2.pack_forget()
+            status = 0
+        print(status)
+
+    def reset_status(self):
+        global status
+        status = 0
 
     def get_tests(self):
         self.test_count = 0
@@ -332,18 +367,18 @@ class PageResults(tk.Frame):
 
             if(self.a.get()==self.test_list[i]):
                 if(self.a.get() in favorites_list):
-                    self.Fav.set("Saved in favorites!")
-                    self.fav_button.configure(bg="#216583", activebackground="#0880af", fg="white", activeforeground="#fcfbdd")
+                    self.Fav.set("Remove from favorites")
+                    self.fav_button.configure(state="normal", fg="#216583", activeforeground="#0880af", bg="#fff1c1", activebackground="#fcfbdd")
                 else:
                     self.Fav.set("Add to favorites")
                     self.fav_button.configure(state="normal", fg="#216583", activeforeground="#0880af", bg="#fff1c1", activebackground="#fcfbdd")
+                    self.fav_button.configure(bg="#216583", activebackground="#0880af", fg="white", activeforeground="#fcfbdd")
 
                 self.data_label['text']= "\n Average duration: "+durations_list[i] + "\n Standard deviation: " + std_list[i]
                 self.img2 = ImageTk.PhotoImage(Image.open("Images/test"+str(i)+".png"))
                 self.lab.configure(image=self.img2)
                 self.lab.image = self.img2
         
-
     def csv_reader(self):
         global durations_list
         global std_list
@@ -361,76 +396,70 @@ class PageResults(tk.Frame):
         if(self.a.get() not in favorites_list):
             favorites_list.append(self.a.get())
             favorites_list.sort()
-            self.Fav.set("Saved in favorites!")
-            self.fav_button.configure(bg="#216583", activebackground="#0880af", fg="white", activeforeground="#fcfbdd")
+            self.Fav.set("Remove from favorites")
+            self.fav_button.configure(fg="#216583", activeforeground="#0880af", bg="#fff1c1", activebackground="#fcfbdd")
+
         else:
             self.Fav.set("Add to favorites")
-            self.fav_button.configure(fg="#216583", activeforeground="#0880af", bg="#fff1c1", activebackground="#fcfbdd")
+            self.fav_button.configure(bg="#216583", activebackground="#0880af", fg="white", activeforeground="#fcfbdd")
             favorites_list.remove(self.a.get())
         print(favorites_list)
+
+        if favorites_list:
+            self.goto_fav.pack()
+            self.warning["text"] = ""
+        else:
+            self.goto_fav.pack_forget()
+            self.warning["text"] = "Select at least one favorite!"
             
 
-class PageGlobRes(tk.Frame):
+        
+class FinalPage(tk.Frame):
     def __init__(self, master):
         self.audio_list=[]
         global file
         tk.Frame.__init__(self, master)
         tk.Frame.configure(self)
-        tk.Label(self, text="Global Results",fg = "#293462", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=5)
-
-        self.back_btn = tk.Button(self, text="Back to test results", bg="#f76262", activebackground="#ff8080", activeforeground="white", fg = "white",
-                  command=lambda: master.switch_frame(PageResults))
-        self.back_btn.pack()
-        
-        tk.Label(self, text = "Favorites", fg = "#293462" , font=("Helvetica", 15, "bold")).pack()
+        tk.Label(self, text="Favorites",fg = "#293462", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=5)
 
         self.fav_frame = tk.Frame(self)
         self.fav_frame.pack()
         self.a = tk.StringVar(self.fav_frame)
+        
+
         self.a.set(favorites_list[0])
-        self.get_tests()
         self.menu = ttk.Combobox(self.fav_frame, textvariable=self.a, values = favorites_list)
         self.menu.pack(side="left")
-
-
         tk.Button(self.fav_frame, text = "Final selection", bg="#216583", activebackground="#0880af", fg="white", activeforeground="white", command=lambda: [self.all_param(), self.change_load()]).pack(side="left")
 
         self.loadfinal=tk.Label(self.fav_frame, text="")
         self.loadfinal.pack(side="left")
 
 
-        self.fav_label = tk.Label(self, text="Test    |   Average duration   |   Standard deviation\n", fg="#293462")
+        self.fav_label = tk.Label(self, text="\n\nTest    |   Average duration   |   Standard deviation\n", fg="#293462")
         self.fav_label.pack()
         self.favorite_data()
         #########################################################################################
 
+        self.back_frame = tk.Frame(self)
+        self.back_frame.pack()
+
+        tk.Button(self.back_frame, text="Test results", bg="#216583", activebackground="#0880af", activeforeground="white", fg = "white",
+                  command=lambda: master.switch_frame(PageResults)).pack(side="left")
+
+        tk.Label(self.final_test, text="").pack()
+
         self.frame_final = tk.Frame(self)
-
-
 
         self.final_test = tk.Frame(self)
         self.final_test.pack()
         self.audio_file = tk.StringVar(self.final_test)
         self.audio_file.set("out001.wav")
         self.menu2 = ttk.Combobox(self.final_test, textvariable=self.audio_file, values = self.audio_list)
+        tk.Label(self.final_test, text="").pack()
         self.btn1 = tk.Button(self.frame_final, text="Listen to selected test", bg="#216583", activebackground="#0880af", fg="white", activeforeground="white", command=lambda: test.play_audio(self.audio_file.get()))
         self.btn2 = tk.Button(self.frame_final, text="Exit", bg="#f76262", activebackground="#ff8080", activeforeground="white", fg = "white", command=lambda: quit())
 
-
-        self.img_frame = tk.Frame(self)
-        self.img_frame.pack(side="bottom")
-        self.img = ImageTk.PhotoImage(Image.open("Images_Global/Plot_Av_Dur.png"))
-        self.lab = tk.Label(self.img_frame, image=self.img)
-        self.lab.image = self.img
-        self.lab.pack(side="left")
-
-
-        self.img2 = ImageTk.PhotoImage(Image.open("Images_Global/STD.png"))
-        self.lab2 = tk.Label(self.img_frame, image=self.img2)
-        self.lab2.image = self.img2
-        self.lab2.pack(side="right")
-
-        
     def read_files(self):
         self.audio_list=[]
         for filename in os.listdir("splitted/"):
@@ -438,22 +467,12 @@ class PageGlobRes(tk.Frame):
         self.audio_list.sort()
         self.show_final_buttons()
 
-
     def show_final_buttons(self):
         self.menu2.pack(side="left")
         self.menu2.configure(values=self.audio_list)
-        self.back_btn.pack_forget()
         self.frame_final.pack()
         self.btn1.pack(side="left")
         self.btn2.pack(side="right")
-
-
-    def get_tests(self):
-        self.test_count = 0
-        self.test_list = []
-        for file in os.listdir("Images/"):
-            self.test_list.append(str(self.test_count))
-            self.test_count = self.test_count+1
 
     def favorite_data(self):
         for i in favorites_list:
@@ -468,9 +487,8 @@ class PageGlobRes(tk.Frame):
         self.loadfinal["text"]="Final segmentation done!"
         self.read_files()
 
-
     def all_param(self): 
-        print("Obteniendo todas las posibles combinaciones de parámetros...")
+        print("Obteniendo todas las posibles combinaciones de parametros...")
         new_list = [sil_list, snd_list, th_list]
         self.param_list = list(itertools.product(*new_list))
         print(str(len(self.param_list)) + " combinaciones obtenidas!\n")
@@ -480,31 +498,6 @@ class PageGlobRes(tk.Frame):
         print(type(self.final_sil))
         print(type(self.final_snd))
         print(type(self.final_th))
-
-
-
-class ListenFinal(tk.Frame):
-    def __init__(self, master):
-        tk.Frame.__init__(self, master)
-        tk.Frame.configure(self)
-        self.read_files()
-        tk.Label(self, text="Test listening\n\n",fg = "#293462", font=('Helvetica', 18, "bold")).pack(side="top", fill="x", pady=5)
-
-        self.fav_frame = tk.Frame(self)
-        self.fav_frame.pack()
-        self.a = tk.StringVar(self.fav_frame)
-        self.a.set("out001.wav")
-        self.menu = ttk.Combobox(self.fav_frame, textvariable=self.a, values = self.audio_list)
-        self.menu.pack(side="left")
-
-        tk.Button(self.fav_frame, text = "Play audio file", bg="#216583", activebackground="#0880af", fg="white", activeforeground="white", command=lambda: [test.play_audio(self.a.get())]).pack(side="right")
-    
-    def read_files(self):
-        self.audio_list=[]
-        for filename in os.listdir("splitted/"):
-            self.audio_list.append(filename)
-        self.audio_list.sort()
-            
 
 if __name__ == "__main__":
     app = SampleApp()
