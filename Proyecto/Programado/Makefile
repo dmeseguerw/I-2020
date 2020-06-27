@@ -1,8 +1,11 @@
-all: execute clean
+all: install_dep app clean
 
-execute:
-	python3 test.py
+install_dep:
+	sudo sh install_dep.sh
+
+app:
+	python3 App.py
 
 clean:
 	rm Images/* Images_Global/*
-	rm -r Waves/*
+	rm -r Waves/* CSV_Files/*
