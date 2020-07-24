@@ -447,7 +447,7 @@ class FinalPage(tk.Frame):
         tk.Button(self.back_frame, text="Test results", bg="#216583", activebackground="#0880af", activeforeground="white", fg = "white",
                   command=lambda: master.switch_frame(PageResults)).pack(side="left")
 
-        tk.Label(self.final_test, text="").pack()
+        tk.Label(self, text="").pack()
 
         self.frame_final = tk.Frame(self)
 
